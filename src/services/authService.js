@@ -1,15 +1,25 @@
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const users = require("../config/users");
 
 class AuthService {
 
-  login(email, password) {
+  async login(email, password) {
 
     const user = users.find(
-      (u) => u.email === email && u.password === password
+      (u) => u.email === email
     );
 
     if (!user) {
+      throw new Error("Invalid credentials");
+    }
+
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!passwordMatch) {
       throw new Error("Invalid credentials");
     }
 
